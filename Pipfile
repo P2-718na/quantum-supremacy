@@ -11,6 +11,7 @@ numpy = "*"
 pylatexenc = "*"
 qiskit-ibm-runtime = "*"
 qiskit = "*"
+qiskit-aer-gpu = "*"
 
 [dev-packages]
 
