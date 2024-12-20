@@ -1,0 +1,6 @@
+Random seed: 9
+Number of qubits: 24
+Number of shots: 100000
+Simulation method: statevector
+Time for job: 4.15 seconds
+Backend used: aer_simulator_statevector_gpu
