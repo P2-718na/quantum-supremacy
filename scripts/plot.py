@@ -27,11 +27,13 @@ def plot_sorted_histogram(input_file, output_file):
 
         # Plot the histogram
         plt.figure(figsize=(10, 6))
-        plt.hist(sorted_values, bins=20, color='blue', edgecolor='black', alpha=0.7)
+        plt.plot(list(range(len(sorted_values))), sorted_values, color='blue')
         plt.title("Histogram of Sorted Integer Values")
         plt.xlabel("Value")
         plt.ylabel("Frequency")
+
         plt.grid(axis='y', linestyle='--', alpha=0.7)
+        plt.xscale("log")
 
         # Save the plot to a PDF file
         plt.savefig(output_file)

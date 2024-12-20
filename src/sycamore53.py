@@ -1,4 +1,4 @@
-from qiskit import QuantumCircuit, transpile
+from qiskit import QuantumCircuit, transpile, qasm2
 from qiskit_aer import Aer, AerSimulator
 from qiskit.quantum_info.operators import Operator
 from math import sin, cos, e, pi, sqrt
@@ -116,9 +116,9 @@ D = [
 patterns = [A, B, C, D, C, D, A, B]
 gates = [XGate().power(1/2), YGate().power(1/2), UnitaryGate([[0, (1-1j)*(1/sqrt(2))], [(1+1j)*(1/sqrt(2)), 0]], label="W^0.5")]
 
-qbits = 20
+qbits = 10
 depth = 14
-shots = 1e7
+shots = 1e5
 method = "statevector"
 #method = "tensor_network"
 
@@ -193,6 +193,7 @@ circuit = create_random_circuit(n_qubits=qbits)
 circuit.measure_all()
 
 print("Done.")
+print(qasm2.dump(circuit, "../dist/circuit.qasm2"))
 
 #print(circuit)
 
@@ -200,6 +201,7 @@ print("Transpiling")
 circuit = transpile(circuit, simulator)
 print("Done. starting simulation")
 job = simulator.run(circuit, shots=shots)
+
 print("Done. Retrieving results.")
 result = job.result()
 
