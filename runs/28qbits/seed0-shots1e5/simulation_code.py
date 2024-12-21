@@ -23,7 +23,7 @@ def save_pretty_json(data, file_path):
 # Parse command-line arguments
 parser = argparse.ArgumentParser(description="Quantum circuit simulation.")
 parser.add_argument('--seed', type=int, default=0, help="Random seed for reproducibility.")
-parser.add_argument('--qbits', type=int, default=28, help="Number of qubits.")
+parser.add_argument('--qbits', type=int, default=10, help="Number of qubits.")
 parser.add_argument('--shots', type=float, default=int(1e6), help="Number of shots.")
 args = parser.parse_args()
 

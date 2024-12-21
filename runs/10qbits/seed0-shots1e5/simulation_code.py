@@ -24,7 +24,7 @@ def save_pretty_json(data, file_path):
 parser = argparse.ArgumentParser(description="Quantum circuit simulation.")
 parser.add_argument('--seed', type=int, default=0, help="Random seed for reproducibility.")
 parser.add_argument('--qbits', type=int, default=10, help="Number of qubits.")
-parser.add_argument('--shots', type=float, default=int(1e6), help="Number of shots.")
+parser.add_argument('--shots', type=float, default=int(1e7), help="Number of shots.")
 args = parser.parse_args()
 
 # Set parameters from command-line arguments
@@ -40,7 +40,7 @@ depth = (5 * qbits) ** 2
 method = "statevector"  # Simulation method
 couplings = [[4, 5], [6, 7], [7, 8], [16, 26], [28, 29], [30, 31], [31, 32], [32, 36], [36, 51], [50, 49], [48, 47], [46, 45], [42, 41], [40, 39], [39, 38], [40, 41], [42, 43], [43, 44], [44, 45], [46, 47], [48, 49], [50, 51], [30, 29], [27, 26], [16, 8], [6, 5], [4, 3], [3, 2], [2, 1], [1, 0]]
 available_qbits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 16, 26, 27, 28, 29, 30, 31, 32, 36, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38]
-max_qbits = max(available_qbits)
+max_qbits = max(available_qbits)+1
 
 # Result paths
 base_folder     = f"../runs/{qbits}qbits/seed{args.seed}-shots1e{int(log(shots, 10))}/"

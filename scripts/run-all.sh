@@ -4,7 +4,7 @@
 
 # Define ranges for parameters
 seeds=$(seq 0 1 9)
-qbits=$(seq 10 1 28)
+qbits=$(seq 10 3 28)
 
 # Path to your Python script
 script_path="../src/eagle3.py"
