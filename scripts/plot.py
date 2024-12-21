@@ -19,7 +19,7 @@ def plot_sorted_histogram(input_file, output_file):
             data = json.load(file)
 
         # Ensure all elements have integer values
-        if not all(isinstance(value, int) for value in data.values()):
+        if not all(isinstance(value, int) for value in data.values()) and not all(isinstance(value, float) for value in data.values()):
             raise ValueError("All elements in the JSON must have integer values.")
 
         # Sort the integers from highest to lowest
