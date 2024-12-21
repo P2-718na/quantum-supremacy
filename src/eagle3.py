@@ -1,4 +1,5 @@
 from qiskit import QuantumCircuit, transpile, qasm2
+from qiskit.quantum_info import Statevector
 from qiskit_aer import Aer, AerSimulator
 from qiskit.quantum_info.operators import Operator
 from math import sin, cos, e, pi, sqrt, log
@@ -10,6 +11,33 @@ import time
 import argparse
 import os
 import shutil
+
+
+def yeet_bad_qasm(file_path):
+    string = "save_probabilities"
+    try:
+        # Read the file contents
+        with open(file_path, 'r') as file:
+            lines = file.readlines()
+
+        # Filter out lines that start with the specified string
+        filtered_lines = [line for line in lines if not string in line]
+
+        # Write the updated content back to the file
+        with open(file_path, 'w') as file:
+            file.writelines(filtered_lines)
+
+        print(f"Lines containing '{string}' have been removed from qasm.")
+
+    except FileNotFoundError:
+        print(f"Error: The file at {file_path} was not found.")
+    except Exception as e:
+        print(f"An error occurred: {e}")
+
+
+# Example usage
+# delete_line_starting_with('example.txt', 'REMOVE_ME')
+
 
 # Utility function to save JSON data
 def save_pretty_json(data, file_path):
@@ -24,13 +52,16 @@ def save_pretty_json(data, file_path):
 parser = argparse.ArgumentParser(description="Quantum circuit simulation.")
 parser.add_argument('--seed', type=int, default=0, help="Random seed for reproducibility.")
 parser.add_argument('--qbits', type=int, default=10, help="Number of qubits.")
-parser.add_argument('--shots', type=float, default=int(1e6), help="Number of shots.")
+parser.add_argument('--shots', type=float, default=int(1), help="Number of shots.")
 args = parser.parse_args()
 
 # Set parameters from command-line arguments
 random.seed(args.seed)
 qbits = args.qbits
 shots = int(args.shots)
+
+
+dry_run = False
 
 # Define available gates
 gates = [XGate(), SXGate()]
@@ -43,9 +74,10 @@ available_qbits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 16, 26, 27, 28, 29, 30, 31, 32, 36
 max_qbits = max(available_qbits)+1
 
 # Result paths
-base_folder     = f"../runs/{qbits}qbits/seed{args.seed}-shots1e{int(log(shots, 10))}/"
+base_folder     = f"../runs/{qbits}qbits/seed{args.seed}-shots1e{int(log(shots, 10))}/" if not dry_run else "../dist/"
 qasm_file_path  = base_folder + "circuit.qasm"
 json_file_path  = base_folder + "output.json"
+prob_file_path  = base_folder + "probabilities.json"
 log_file_path   = base_folder + "log.txt"
 code_backup_path = base_folder + "simulation_code.py"
 
@@ -87,7 +119,7 @@ def create_random_circuit(n_qubits):
 
         circuit.append(gates[choice], [qbit])
         circuit.barrier([qbit])
-
+    circuit.save_probabilities_dict(qbits_in_use)
     for cbit, qbit in enumerate(qbits_in_use):
             circuit.measure([qbit], [cbit])
     return circuit
@@ -108,6 +140,7 @@ print("Done.")
 # Save the circuit QASM to a file
 try:
     qasm2.dump(circuit, qasm_file_path)
+    yeet_bad_qasm(qasm_file_path)
     print(f"QASM successfully written to {qasm_file_path}")
 except Exception as e:
     print(f"An error occurred while saving QASM: {e}")
@@ -130,9 +163,16 @@ run_time = end_time - start_time
 print(f"Time for job: {run_time:.2f} seconds")
 
 # Save the results to a JSON file
-print("Writing JSON.")
+print("Writing shots JSON.")
 save_pretty_json(result.get_counts(), json_file_path)
 print(f'backend: {result.backend_name}')
+
+print("Writing probabilities JSON")
+probabilities = result.data()["probabilities"]
+def keys_to_binary(d):
+    return {format(key, '052b'): value for key, value in d.items()}
+
+save_pretty_json(keys_to_binary(probabilities), prob_file_path)
 
 # Save all parameters and printed output to a log file
 try:
