@@ -30,6 +30,8 @@ valid2 = [40, 41, 42, 43, 43, 44, 44, 45, 46, 47, 48, 49, 50, 51, 30, 29, 27, 26
 couplings1 = create_consecutive_pairs(valid1)
 couplings2 = create_consecutive_pairs(valid2)
 
+print(couplings1, couplings2)
+
 def create_calibration_circuit():
     circuit = QuantumCircuit(max_qbit+1)
 

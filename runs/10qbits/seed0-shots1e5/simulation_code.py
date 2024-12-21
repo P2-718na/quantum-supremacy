@@ -3,7 +3,7 @@ from qiskit_aer import Aer, AerSimulator
 from qiskit.quantum_info.operators import Operator
 from math import sin, cos, e, pi, sqrt, log
 from random import gauss
-from qiskit.circuit.library import YGate, SXGate, XGate, UnitaryGate, RZGate, ECRGate
+from qiskit.circuit.library import YGate, SXGate, XGate, UnitaryGate, RZGate, ECRGate, CXGate
 import random
 import json
 import time
@@ -24,7 +24,7 @@ def save_pretty_json(data, file_path):
 parser = argparse.ArgumentParser(description="Quantum circuit simulation.")
 parser.add_argument('--seed', type=int, default=0, help="Random seed for reproducibility.")
 parser.add_argument('--qbits', type=int, default=10, help="Number of qubits.")
-parser.add_argument('--shots', type=float, default=int(1e7), help="Number of shots.")
+parser.add_argument('--shots', type=float, default=int(1e6), help="Number of shots.")
 args = parser.parse_args()
 
 # Set parameters from command-line arguments
@@ -38,7 +38,9 @@ gates = [XGate(), SXGate()]
 # Simulation parameters
 depth = (5 * qbits) ** 2
 method = "statevector"  # Simulation method
-max_qbits = 53  # Maximum number of qubits
+couplings = [[4, 5], [6, 7], [7, 8], [16, 26], [28, 29], [30, 31], [31, 32], [32, 36], [36, 51], [50, 49], [48, 47], [46, 45], [42, 41], [40, 39], [39, 38], [40, 41], [42, 43], [43, 44], [44, 45], [46, 47], [48, 49], [50, 51], [30, 29], [27, 26], [16, 8], [6, 5], [4, 3], [3, 2], [2, 1], [1, 0]]
+available_qbits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 16, 26, 27, 28, 29, 30, 31, 32, 36, 51, 50, 49, 48, 47, 46, 45, 44, 43, 42, 41, 40, 39, 38]
+max_qbits = max(available_qbits)
 
 # Result paths
 base_folder     = f"../runs/{qbits}qbits/seed{args.seed}-shots1e{int(log(shots, 10))}/"
@@ -58,27 +60,36 @@ try:
 except Exception as e:
     print(f"An error occurred while backing up the script: {e}")
 
+
 # Function to create a random quantum circuit
 def create_random_circuit(n_qubits):
-    circuit = QuantumCircuit(n_qubits)
+    circuit = QuantumCircuit(n_qubits, n_qubits)
+    qbits_in_use = available_qbits[:qbits]
 
     for d in range(depth):
         choice = random.choice([0, 1, 2, 3])
-        qbit = random.randint(0, qbits - 1)
+        qbit = random.choice(qbits_in_use)
 
         if choice == 3:
-            positon = random.choice([[qbit, qbit + 1], [qbit, qbit - 1]])
-            if not all(qbit >= 0 and qbit < qbits for qbit in positon):
-                continue
-            circuit.append(ECRGate(), positon)
+            while True:
+                position = random.choice(couplings)
+                if position[0] in qbits_in_use and position[1] in qbits_in_use:
+                    break
+
+            circuit.append(ECRGate(), position)
+            circuit.barrier(position)
             continue
 
         if choice == 2:
-            circuit.append(RZGate(random.choice([pi / 4, pi / 2, -pi / 4, -pi / 2, pi, 3/4 * pi, -3/4 * pi])), [qbit])
+            circuit.append(RZGate(random.uniform(-pi, pi)), [qbit])
+            circuit.barrier([qbit])
             continue
 
         circuit.append(gates[choice], [qbit])
+        circuit.barrier([qbit])
 
+    for cbit, qbit in enumerate(qbits_in_use):
+            circuit.measure([qbit], [cbit])
     return circuit
 
 # Setup simulator
@@ -89,8 +100,7 @@ print(simulator.configuration())
 
 # Generate the quantum circuit
 print("Generating circuit")
-circuit = create_random_circuit(n_qubits=qbits)
-circuit.measure_all()
+circuit = create_random_circuit(n_qubits=max_qbits)
 
 print("Done.")
 #print(circuit)
