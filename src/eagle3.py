@@ -3,7 +3,7 @@ from qiskit_aer import Aer, AerSimulator
 from qiskit.quantum_info.operators import Operator
 from math import sin, cos, e, pi, sqrt, log
 from random import gauss
-from qiskit.circuit.library import YGate, SXGate, XGate, UnitaryGate, RZGate, ECRGate
+from qiskit.circuit.library import YGate, SXGate, XGate, UnitaryGate, RZGate, ECRGate, CXGate
 import random
 import json
 import time
@@ -24,7 +24,7 @@ def save_pretty_json(data, file_path):
 parser = argparse.ArgumentParser(description="Quantum circuit simulation.")
 parser.add_argument('--seed', type=int, default=0, help="Random seed for reproducibility.")
 parser.add_argument('--qbits', type=int, default=10, help="Number of qubits.")
-parser.add_argument('--shots', type=float, default=int(1e7), help="Number of shots.")
+parser.add_argument('--shots', type=float, default=int(1e6), help="Number of shots.")
 args = parser.parse_args()
 
 # Set parameters from command-line arguments
@@ -67,17 +67,20 @@ def create_random_circuit(n_qubits):
         qbit = random.randint(0, qbits - 1)
 
         if choice == 3:
-            positon = random.choice([[qbit, qbit + 1], [qbit, qbit - 1]])
-            if not all(qbit >= 0 and qbit < qbits for qbit in positon):
+            position = random.choice([[qbit, qbit - 1], [qbit, qbit + 1]])
+            if not all(qbit >= 0 and qbit < qbits for qbit in position):
                 continue
-            circuit.append(ECRGate(), positon)
+            circuit.append(ECRGate(), position)
+            circuit.barrier(position)
             continue
 
         if choice == 2:
-            circuit.append(RZGate(random.choice([pi / 4, pi / 2, -pi / 4, -pi / 2, pi, 3/4 * pi, -3/4 * pi])), [qbit])
+            circuit.append(RZGate(random.uniform(-pi, pi)), [qbit])
+            circuit.barrier([qbit])
             continue
 
         circuit.append(gates[choice], [qbit])
+        circuit.barrier([qbit])
 
     return circuit
 
