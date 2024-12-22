@@ -74,7 +74,7 @@ available_qbits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 16, 26, 27, 28, 29, 30, 31, 32, 36
 max_qbits = max(available_qbits)+1
 
 # Result paths
-base_folder     = f"../runs/{qbits}qbits/seed{args.seed}-shots1e{int(log(shots, 10))}/" if not dry_run else "../dist/"
+base_folder     = f"../runs/{qbits}qbits/seed{args.seed}/" if not dry_run else "../dist/"
 qasm_file_path  = base_folder + "circuit.qasm"
 json_file_path  = base_folder + "output.json"
 prob_file_path  = base_folder + "probabilities.json"
@@ -119,7 +119,7 @@ def create_random_circuit(n_qubits):
 
         circuit.append(gates[choice], [qbit])
         circuit.barrier([qbit])
-    circuit.save_probabilities_dict(qbits_in_use)
+    circuit.save_probabilities(qbits_in_use)
     for cbit, qbit in enumerate(qbits_in_use):
             circuit.measure([qbit], [cbit])
     return circuit
@@ -172,7 +172,7 @@ probabilities = result.data()["probabilities"]
 def keys_to_binary(d):
     return {format(key, '052b'): value for key, value in d.items()}
 
-save_pretty_json(keys_to_binary(probabilities), prob_file_path)
+save_pretty_json(probabilities.tolist(), prob_file_path)
 
 # Save all parameters and printed output to a log file
 try:
