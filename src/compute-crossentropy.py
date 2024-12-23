@@ -8,7 +8,7 @@ def compute_xeb_fidelity(simulated_probs, observed_counts, num_qubits):
     # Total number of observed samples
     total_samples = sum(observed_counts.values())
 
-    #print(sum(simulated_probs.values()))
+    print(sum(simulated_probs))
     print(total_samples)
 
     state_index, count = list(observed_counts.items())[0]
@@ -54,8 +54,8 @@ def load_observed_counts(file_path):
 
 
 if __name__ == "__main__":
-    num_qubits = 10  # Example valu
-    seed = 0
+    num_qubits = 22  # Example valu
+    seed = 3
 
     # Placeholder paths for input files
     simulated_probs_file = f"../runs/{num_qubits}qbits/seed{seed}/probabilities.json"
