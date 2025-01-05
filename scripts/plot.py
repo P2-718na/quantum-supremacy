@@ -1,6 +1,13 @@
 import json
 import matplotlib.pyplot as plt
 import argparse
+from math import log
+
+
+def sort_by_key(input_dict):
+    sorted_keys = sorted(input_dict.keys())
+    sorted_values = [input_dict[key] for key in sorted_keys]
+    return sorted_values
 
 def plot_sorted_histogram(input_file, output_file):
     """
@@ -27,13 +34,14 @@ def plot_sorted_histogram(input_file, output_file):
 
         # Plot the histogram
         plt.figure(figsize=(10, 6))
-        plt.plot(list(range(len(sorted_values))), sorted_values, color='blue')
-        plt.title("Histogram of Sorted Integer Values")
-        plt.xlabel("Value")
-        plt.ylabel("Frequency")
+        #plt.plot(list(range(len(sorted_values))), sorted_values, color='blue')
+        plt.hist(sorted_values, bins=20, color='blue')
+        plt.title("Example of random circuit output")
+        plt.xlabel("Bitstring")
+        plt.ylabel("Counts")
 
         plt.grid(axis='y', linestyle='--', alpha=0.7)
-        plt.xscale("log")
+        #plt.yscale("log")
 
         # Save the plot to a PDF file
         plt.savefig(output_file)

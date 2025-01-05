@@ -15,15 +15,11 @@ def compute_xeb_fidelity(simulated_probs, observed_counts, num_qubits):
     print(simulated_probs[int(state_index)], count)
     print("len", len(simulated_probs))
 
-
     avg_prob = 0
     for bitstring, count in observed_counts.items():
-        simulated_prob = simulated_probs[int(bitstring)]
+        simulated_prob = simulated_probs[int(bitstring) if len(bitstring) != 52 else int(bitstring, 2)]
         observed_prob  = count / total_samples
         avg_prob += simulated_prob * observed_prob
-
-        #print(simulated_prob, observed_prob)
-    # Calculate the average ideal probability for observed bitstrings
 
     # Calculate the XEB fidelity
     fidelity = (2 ** num_qubits) * avg_prob - 1
@@ -54,14 +50,15 @@ def load_observed_counts(file_path):
 
 
 if __name__ == "__main__":
-    num_qubits = 22  # Example valu
-    seed = 3
+    num_qubits = 25  # Example valu
+    seed = 1
 
     # Placeholder paths for input files
     simulated_probs_file = f"../runs/{num_qubits}qbits/seed{seed}/probabilities.json"
-    #simulated_probs_file = f"../dist/probabilities.json"
     observed_counts_file = f"../jobs/{num_qubits}qbits/seed{seed}/counts.json"
 
+    #simulated_probs_file = f"../dist/probabilities.json"
+    observed_counts_file = "../dist/processed_counts.json"
     # Number of qubits in the circuie
 
     # Load data
